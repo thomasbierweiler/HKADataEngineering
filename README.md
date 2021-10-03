@@ -1,1 +1,1 @@
-# HSKADataEnegineering
+# Hochschule Karlsruhe Data Engineering
