@@ -4,6 +4,7 @@ def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe("topic/test/#")
     client.subscribe("client/lastwill")
+    # message filter, use callback on_clb for all topics that match topic/test/...
     client.message_callback_add("topic/test/#",on_clb)
 
 def on_message(client, userdata, msg):
@@ -15,7 +16,7 @@ def on_message(client, userdata, msg):
 
 def on_clb(client, userdata, msg):
     cnt=msg.payload.decode()
-    print('On_clb: Topic {}: Received message {} at time.'.format(msg.topic,cnt))
+    print('On_clb: Topic {}: Received message {}.'.format(msg.topic,cnt))
     
 client=mqtt.Client(client_id="Subscriber")
 client.connect("localhost",1883,60)
