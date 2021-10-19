@@ -131,7 +131,7 @@ dmypy.json
 # ignore SPARQL elephant.py
 Uebungen/08-SPARQL/08-SPARQL-elephant.py
 
-# ignore Uebungen/14-OPC-UA-Siemens-intern/
+# ignore sub folders in Uebungen/14 ...
 Uebungen/14-OPC-UA-Siemens-intern/
-
-
+Uebungen/15-OPC-UA/UA-.NETStandard-Samples-master/
+Uebungen/17-OPC-UA-server-python/opcua-asyncio-master/
