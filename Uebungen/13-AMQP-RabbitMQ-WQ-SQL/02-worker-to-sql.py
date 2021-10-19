@@ -20,6 +20,7 @@ import pyodbc
 
 # initialize random with current system time
 random.seed()
+# SQL server connection
 server='md2c0gdc' 
 database='HKA_AMQP' 
 username='sa' 

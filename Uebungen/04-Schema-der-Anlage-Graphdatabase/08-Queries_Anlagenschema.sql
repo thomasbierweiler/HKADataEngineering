@@ -1,3 +1,6 @@
+USE HSKAGraphAnlagenschema;
+GO
+
 -- Find connections of pump PL1200
 SELECT CONCAT(asset1.AKZ,'->',asset2.AKZ)
 FROM Assets asset1, connectedTo, Assets asset2

@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ignore SPARQL elephant.py
+Uebungen/08-SPARQL/08-SPARQL-elephant.py
+
+# ignore Uebungen/14-OPC-UA-Siemens-intern/
+Uebungen/14-OPC-UA-Siemens-intern/
+
+
