@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+// option java_multiple_files = true;
+// option java_package = "io.grpc.hka.students";
+// option java_outer_classname = "StudentsProto";
+// option objc_class_prefix = "HKAS";
+
+// Interface exported by the server
+service MathFunc {
+    // method accepts the name of a student and returns an instance of Student (including full information)
+    rpc GuessFunction(FunctionDescription) returns (State) {}
+	rpc Delete(DelMsg) returns (DelState) {}
+}
+
+// class definition for FunctionDescription
+message FunctionDescription {
+    // field 1
+    int32 id = 1;
+}
+
+// class definition of Student
+message State {
+    // field 1
+    bool scheduling = 1;
+	// field 2
+	bool scheduled = 2;
+    // field 3
+    bool resultready = 3;
+}
+
+message DelMsg{
+}
+message DelState{
+}
