@@ -6,12 +6,7 @@ import mathfunc_pb2 as mathfunc__pb2
 
 
 class MathFuncStub(object):
-    """option java_multiple_files = true;
-    option java_package = "io.grpc.hka.students";
-    option java_outer_classname = "StudentsProto";
-    option objc_class_prefix = "HKAS";
-
-    Interface exported by the server
+    """Interface exported by the server
     """
 
     def __init__(self, channel):
@@ -33,23 +28,19 @@ class MathFuncStub(object):
 
 
 class MathFuncServicer(object):
-    """option java_multiple_files = true;
-    option java_package = "io.grpc.hka.students";
-    option java_outer_classname = "StudentsProto";
-    option objc_class_prefix = "HKAS";
-
-    Interface exported by the server
+    """Interface exported by the server
     """
 
     def GuessFunction(self, request, context):
-        """method accepts the name of a student and returns an instance of Student (including full information)
+        """method fits a function to a given data set
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def Delete(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """method deletes the results (fitted function) for all data sets
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -75,12 +66,7 @@ def add_MathFuncServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class MathFunc(object):
-    """option java_multiple_files = true;
-    option java_package = "io.grpc.hka.students";
-    option java_outer_classname = "StudentsProto";
-    option objc_class_prefix = "HKAS";
-
-    Interface exported by the server
+    """Interface exported by the server
     """
 
     @staticmethod
