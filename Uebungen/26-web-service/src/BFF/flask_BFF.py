@@ -124,14 +124,14 @@ def fittedfunction():
             description: Information about fitted functions.
     """
     # get information from linear regression
-    fnc=dblinreg.get_functions(config)
+    fnc,rmse=dblinreg.get_functions(config)
     d=[]
-    for f in fnc:
-        d.append({"Method": "linear regression", "Function": f })
+    for f in zip(fnc,rmse):
+        d.append({"Method": "linear regression", "Function": f[0], "RMSE": f[1] })
     # get information from genetic programming
-    fgp=dbgp.get_functions(config)
-    for f in fgp:
-        d.append({"Method": "genetic programming", "Function":f})
+    fgp,rmse=dbgp.get_functions(config)
+    for f in zip(fgp,rmse):
+        d.append({"Method": "genetic programming", "Function": f[0], "RMSE": f[1]})
     return jsonify(d)
 
 if __name__ == "__main__":

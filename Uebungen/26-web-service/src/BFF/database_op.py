@@ -80,9 +80,9 @@ def fill_function_db(config):
         cursor.execute("INSERT INTO datapoints(FunctionId,x,y) VALUES (?,?,?)",functionId,x,y)
     # insert data points for function 3
     functionId=cursor.execute("SELECT Id FROM Functions WHERE Name='y=2*(x+1)**3+3'").fetchone()[0]
-    xv=np.linspace(-7.0,6,num=200)
+    xv=np.linspace(-4.0,3.0,num=1500)
     for x in xv:
-        y=2*(x+1)**3+3
+        y=2*(x+1.0)**3.0+3.0
         cursor.execute("INSERT INTO datapoints(FunctionId,x,y) VALUES (?,?,?)",functionId,x,y)
     cnxn.commit()
     cnxn.close()

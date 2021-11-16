@@ -7,15 +7,17 @@ LStr=List[str]
 def get_functions(config)->LStr:
     # check if db exists
     fnc=[]
+    rmse=[]
     if exists_db(config):
         drv=pyodbc.drivers()
         DRIVER_NAME=drv[3]
         SQL_STR="Driver={"+DRIVER_NAME+"};SERVER="+config['SERVER']+';DATABASE='+config['DBLINREG']+';UID='+config['UID']+';PWD='+config['PWD']
         cnxn=pyodbc.connect(SQL_STR)
         cursor=cnxn.cursor()
-        for row in cursor.execute("SELECT [FunctionId],[function] FROM [dbo].[linregresult] WHERE [ready]=1").fetchall():
+        for row in cursor.execute("SELECT [FunctionId],[function],[RMSE] FROM [dbo].[linregresult] WHERE [ready]=1").fetchall():
             fnc.append('{}: {}'.format(row[0],row[1]))
-    return fnc
+            rmse.append('{}: {}'.format(row[0],row[2]))
+    return fnc,rmse
 
 def exists_db(config)->bool:
     drv=pyodbc.drivers()

@@ -35,8 +35,8 @@ def create_table_gpresult(config):
         [FunctionId] [int] NOT NULL,
         [scheduled] [bit] NOT NULL,
         [ready] [bit] NOT NULL,
-        [function] [nvarchar](max) NULL
-        )
+        [function] [nvarchar](max) NULL,
+        [root_mean_squared_error] [float] NULL)
         """
     cursor.execute(SQL_QUERY)
     cnxn.commit()
@@ -67,6 +67,31 @@ def get_status(config,function_id:int)->mathfunc_pb2.State:
     cnxn.close()
     return state
 
+def set_status_scheduled(config,function_id):
+    drv = pyodbc.drivers()
+    DRIVER_NAME=drv[3]
+    SQL_STR="Driver={"+DRIVER_NAME+"};SERVER="+config['SERVER']+';DATABASE='+config['DBGP']+';UID='+config['UID']+';PWD='+config['PWD']
+    cnxn=pyodbc.connect(SQL_STR,autocommit=True)
+    cnxn.cursor().execute("INSERT INTO gpresult(FunctionId,scheduled,ready) VALUES (?,?,?)",function_id,True,False)
+    cnxn.close()
+
+def gpmodel_todb(config,function_id:int,fnc:str,rmse:float):
+    drv = pyodbc.drivers()
+    DRIVER_NAME=drv[3]
+    SQL_STR="Driver={"+DRIVER_NAME+"};SERVER="+config['SERVER']+';DATABASE='+config['DBGP']+';UID='+config['UID']+';PWD='+config['PWD']
+    cnxn=pyodbc.connect(SQL_STR,autocommit=True)
+    cnxn.cursor().execute("UPDATE gpresult SET [scheduled]=?,[ready]=?,[function]=?,[root_mean_squared_error]=? WHERE [FunctionId]=?",False,True,fnc,rmse,function_id)
+    cnxn.close()
+    
+def delete_fitted(config):
+    drv = pyodbc.drivers()
+    DRIVER_NAME=drv[3]
+    SQL_STR="Driver={"+DRIVER_NAME+"};SERVER="+config['SERVER']+';DATABASE='+config['DBGP']+';UID='+config['UID']+';PWD='+config['PWD']
+    cnxn=pyodbc.connect(SQL_STR,autocommit=True)
+    cnxn.cursor().execute("DELETE FROM gpresult")
+    cnxn.close()
+
+# read datapoints from source database
 def get_datapoints(config,function_id:int)->pd.DataFrame:
     drv = pyodbc.drivers()
     DRIVER_NAME=drv[3]
@@ -79,27 +104,3 @@ def get_datapoints(config,function_id:int)->pd.DataFrame:
     df=pd.read_sql(SQL,cnxn)
     cnxn.close()
     return df
-
-def set_status_scheduled(config,function_id):
-    drv = pyodbc.drivers()
-    DRIVER_NAME=drv[3]
-    SQL_STR="Driver={"+DRIVER_NAME+"};SERVER="+config['SERVER']+';DATABASE='+config['DBGP']+';UID='+config['UID']+';PWD='+config['PWD']
-    cnxn=pyodbc.connect(SQL_STR,autocommit=True)
-    cnxn.cursor().execute("INSERT INTO gpresult(FunctionId,scheduled,ready) VALUES (?,?,?)",function_id,True,False)
-    cnxn.close()
-
-def gpmodel_todb(config,function_id:int,fnc:str):
-    drv = pyodbc.drivers()
-    DRIVER_NAME=drv[3]
-    SQL_STR="Driver={"+DRIVER_NAME+"};SERVER="+config['SERVER']+';DATABASE='+config['DBGP']+';UID='+config['UID']+';PWD='+config['PWD']
-    cnxn=pyodbc.connect(SQL_STR,autocommit=True)
-    cnxn.cursor().execute("UPDATE gpresult SET [scheduled]=?,[ready]=?,[function]=? WHERE [FunctionId]=?",False,True,fnc,function_id)
-    cnxn.close()
-    
-def delete_fitted(config):
-    drv = pyodbc.drivers()
-    DRIVER_NAME=drv[3]
-    SQL_STR="Driver={"+DRIVER_NAME+"};SERVER="+config['SERVER']+';DATABASE='+config['DBGP']+';UID='+config['UID']+';PWD='+config['PWD']
-    cnxn=pyodbc.connect(SQL_STR,autocommit=True)
-    cnxn.cursor().execute("DELETE FROM gpresult")
-    cnxn.close()

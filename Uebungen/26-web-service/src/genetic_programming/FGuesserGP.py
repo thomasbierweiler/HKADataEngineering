@@ -18,9 +18,9 @@ class FGuesserGP:
             # update db entry
             db.set_status_scheduled(config,function_id)
             # guess function
-            fnc=self._guess_gp(config,function_id)
+            fnc,rmse=self._guess_gp(config,function_id)
             # update db entry
-            db.gpmodel_todb(config,function_id,fnc)
+            db.gpmodel_todb(config,function_id,fnc,rmse=rmse)
             state.scheduling=True            
         return state
 
@@ -34,5 +34,9 @@ class FGuesserGP:
         # read result from file
         with open('.\data\sympy_term{}.txt'.format(function_id),"r") as f:
             fnc=f.readline()
-            print('FGuesserGP: Function determined by GP: {}'.format(fnc))
-        return fnc
+            # remove trailing new line
+            fnc=fnc[:-1]
+            rmse=f.readline()
+            rmse=rmse[:-1]
+            print('FGuesserGP: Function determined by GP: {}, RMSE={}'.format(fnc,rmse))
+        return fnc,float(rmse)
