@@ -86,7 +86,6 @@ def guess(dataset):
             description: returns the state of fitting (scheduling, scheduled, ready)
     """
     d=[]
-    html="<p>Fitting function status for function id {}</p>".format(dataset)
     # linear regression
     lnr=grpc_linearregression_client()
     state=lnr.run(int(dataset),config)

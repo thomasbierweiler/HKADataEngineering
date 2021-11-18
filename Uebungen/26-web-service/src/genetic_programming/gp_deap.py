@@ -43,9 +43,6 @@ ngen=50
 # size of initial population
 npop=5000
 
-# initialize random seed
-random.seed(1)
-
 # read command line input
 if len(sys.argv)>1:
     function_id=sys.argv[1]
@@ -167,6 +164,7 @@ toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_v
 toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
 def main():
+    # initialize random seed for reproducibility
     random.seed(318)
 
     pop = toolbox.population(n=npop)
