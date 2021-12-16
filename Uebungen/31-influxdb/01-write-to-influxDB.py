@@ -21,6 +21,7 @@ client=influxdb_client.InfluxDBClient(
 write_api=client.write_api(write_options=SYNCHRONOUS)
 
 #Create a point object and write it to InfluxDB
-p=influxdb_client.Point("my_measurement").tag("location", "Prague").field("temperature", 25.3)
+p=influxdb_client.Point("my_measurement").tag("location", "Prague") \
+   .field("temperature", 25.3)
 write_api.write(bucket=bucket, org=org, record=p)
 
