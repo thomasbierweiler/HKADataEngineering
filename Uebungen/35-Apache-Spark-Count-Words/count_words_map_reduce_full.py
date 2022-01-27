@@ -2,7 +2,6 @@
 # no parallel processing is used
 from datetime import datetime
 
-start=datetime.now()
 f_map="map.hdf5"
 f_shuffle="shuffle.hdf5"
 f_reduce="reduce.hdf5"
@@ -13,7 +12,7 @@ import re
 # Hierarchical Data Format hdf5
 import h5py
 import numpy as np
-inputFile="patent_claims_excerpt.csv"
+inputFile="patent_claims_excerpt3.csv"
 # create a hdf5-file for storing key/value pairs (hdf5 with results from map processes)
 map_hdf5=h5py.File(f_map, "w")
 # open the file
@@ -22,30 +21,28 @@ with open(inputFile,'r') as fo:
     # read a line of the file (this can be done in parallel by each map process)
     for chunk in iter(lambda: fo.readline(), ''):
         cnt+=1
-        # l=chunk.replace(".","").replace(",","").split(" ") # Here we achieve a split at a blank, usage of regular expressions is more general
-        # split line into separate words using regular expressions
-        l=re.split("\W",chunk)
+        # split line into separate words
+        splits=re.split("\W",chunk)
+        # map part 1: for each word, generate pairs
+        # [ ("word1", 1), ("word2", 1), ("word3", 1), ("wordi", 1) ,..., ("wordn", 1) ]
+        pairs=[]
+        for split in splits:
+            if split != '':
+                pairs.append((split,1))
         # map part 2: iterate over pairs and create key / values (arrays [1,1,...])
         # Key1: [1], Key2: [1], Key3: [1,1], Key4: [1], Key5: [1,1,1] ...
-        d={}
-        for i in l:
-            if i=='':
-                continue
-            # check if key (word) exists in dictionary
-            if i in d:
-                # increase count of words (original algorithm appends a "1" to a list)
-                d[i]+=1
-            # if key is not present in dictionary, create key with value 1
+        wd=dict()
+        for p in pairs:
+            if p[0] in wd:
+                wd[p[0]].append(1)
             else:
-                d.update({i:1})
+                wd[p[0]]=[1]
         # create a group for the map process
         g=map_hdf5.create_group('g'+str(cnt))
         # map process writes result to hdf5 file
-        for item in d.items():
+        for item in wd.items():
             g[item[0]]=item[1]
 # close hdf storage
-# hdf5 contains a group for each map process, i.e. for each line of the text file
-# each group contains key/value pairs for each word; each value is the number of occurrences of the corresponding word (key)
 map_hdf5.close()
 ######### shuffle phase #########
 print(str(datetime.now()) + ": Starting shuffle")
@@ -53,25 +50,23 @@ print(str(datetime.now()) + ": Starting shuffle")
 map_hdf5=h5py.File(f_map, "r")
 # create hdf5 for result of shuffle phase
 shuffle_hdf5=h5py.File(f_shuffle, "w")
-# iterate over map processes (groups)
+# iterate over map processes
 for p in map_hdf5.keys():
-    # iterate over words (keys in hdf5)
+    # iterate over words (groups in hdf5)
     for w in map_hdf5[p]:
         # add content to shuffle hdf5
         # check if word is a key in shuffle hdf5
         if w in shuffle_hdf5:
-            # access list by key, and then append itme to list by content of map_hdf5
-            lo=list(shuffle_hdf5[w])
-            lo.append(map_hdf5[p][w][()])
+            # access list by key, and then extend list by content of map_hdf5
+            s=list(shuffle_hdf5[w])
+            m=list(map_hdf5[p][w])
+            s.extend(m)
             # update values in hdf5
             del shuffle_hdf5[w]
-            shuffle_hdf5[w]=lo
-        # create new key and assign list values
+            shuffle_hdf5[w]=s
         else:
-            # extract value (type: integer) from hdf5
-            l=[map_hdf5[p][w][()]]
-            # assign new key/value pair
-            shuffle_hdf5[w]=l
+            shuffle_hdf5[w]=list(map_hdf5[p][w])
+
 # close hdf storages
 map_hdf5.close()
 shuffle_hdf5.close()
@@ -84,7 +79,7 @@ reduce_hdf5=h5py.File(f_reduce, "w")
 # iterate over keys (words)
 for p in shuffle_hdf5.keys():
     # create numpy array from hdf5 list
-    vals=np.array(list(shuffle_hdf5[p]),dtype=np.int64)
+    vals=np.array(list(shuffle_hdf5[p]),dtype=np.uint8)
     # sum over elements
     cw=np.sum(vals)
     # store result in reduce hdf5
@@ -92,24 +87,14 @@ for p in shuffle_hdf5.keys():
 # close hdf storages
 shuffle_hdf5.close()
 reduce_hdf5.close()
-end=datetime.now()
-print('Elapsed time for map/shuffle/reduce: {}'.format(end-start))
-######### retrieve result for word "said" #########
-start=datetime.now()
-reduce_hdf5=h5py.File(f_reduce, "r")
-cnt=reduce_hdf5["said"][()]
-end=datetime.now()
-print("Word 'said' occurred {} times.".format(cnt))
-print('Elapsed time retrieving result from hdf5: {}'.format(end-start))
 ######### Content in hdf5 is not ordered #########
 ######### get words with most occurrences #########
-start=datetime.now()
 print(str(datetime.now()) + ": Get words with most occurrences")
 # open hdf5 with results from reduce phase
 reduce_hdf5=h5py.File(f_reduce, "r")
 # total length
-sz=10
-# create array/list for values and words (keys)
+sz=15
+# create array for values and words (keys)
 vals=np.zeros(0,dtype=int)
 ks=[]
 # iterate through hdf5
@@ -138,5 +123,4 @@ for vk in zip(np.flip(vals),reversed(ks)):
     print('{}: {}.'.format(vk[0],vk[1]))
 # close hdf storage
 reduce_hdf5.close()
-end=datetime.now()
-print('Elapsed time for getting words with most occurrences: {}'.format(end-start))
+

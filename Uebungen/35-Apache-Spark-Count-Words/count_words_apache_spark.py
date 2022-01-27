@@ -6,7 +6,7 @@ import pyspark.sql.functions as f
 import datetime
 
 start=datetime.datetime.now()
-inputFile="patent_claims_excerpt3.csv"
+inputFile="patent_claims_excerpt.csv"
 #inputFile = "patent_claims_excerpt2.csv"
 #inputFile="patent_claims_fulltext_cleaned.csv"
 spark = SparkSession.builder.appName("Count occurrence of each words").getOrCreate()
